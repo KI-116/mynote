@@ -151,5 +151,54 @@ class Solution {
 类似地，回溯算法中的全排列问题，也是通过遍历的方式得出答案。
 ```cpp
 class Solution {
-    
+    public:
+        //记录全排列
+        vector<vector<int>> res;
+        //记录当前路径
+        vector<int> path;
+        //记录当前路径中元素是否访问过
+        vector<bool> used;
+        //输入一组不重复的数字，返回它们的全排列
+        vector<vector<int>> permute(vertor<int>& nums) {
+            used = vector<bool>(nums.size(),false);
+            backtracking(nums);
+            return res;
+        }
+        //回溯算法核心框架，遍历回溯树，收集所有叶子节点上的全排列。
+        void backtrack(vector<int>& nums) {
+            //到达叶子节点
+            if(path.size() == nums.size()) {
+                res.push_back(path);
+                return;
+            }
+            for(int i = 0; i < nums.size(); i++) {
+                //排除使用过的
+                if(used[i]) continue;
+                //做选择
+                path.push_back(nums[i]);
+                used[i] = true;
+                //递归
+                backtrack(nums);
+                //撤销选择
+                path.pop_back();
+                used[i] = false;
+            }
+        }
 }
+```
+可以看出回溯本质是多叉树的遍历。
+
+##### 分解问题
+
+回到计算二叉树最大深度，可以使用**分治**写出如下解法。
+```cpp
+int maxDepth(TreeNode* root) {
+    if(root == nullptr) return 0;
+    //分治
+    int left = maxDepth(root->left);
+    int right = maxDepth(root->right);
+    //合并结果
+    return max(left, right) + 1;
+}
+```
+上面代码的形式和动态规划解法类似。

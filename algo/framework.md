@@ -202,3 +202,80 @@ int maxDepth(TreeNode* root) {
 }
 ```
 上面代码的形式和动态规划解法类似。
+
+对于使用动态规划算法的凑零钱问题：
+> 有一堆面值不同的硬币，每种硬币的数量无限，给定一个金额，求最少需要多少硬币凑出这个金额。
+```cpp
+int coinChange(vector<int>& coins, int amount) {
+    if(amount == 0) return 0;
+    if(amount < 0) return -1;
+
+    int res = INT_MAX;
+    for(int coin : coins) {
+        //子问题
+        int subproblem = coinChange(coins, amount - coin);
+        //子问题无解
+        if(subproblem == -1) continue;
+        //求最小值
+        res = min(res, 1 + subproblem);
+    }
+    return res == INT_MAX ? -1 : res;
+}
+```
+
+##### 思路拓展
+
+对于二叉树的前序遍历，除了递归，还可以使用分解问题的思路来解决。
+
+对于前序遍历的结果，可以发现，根节点总是在最前面，左子树在中间，右子树在最后。
+
+所以，用分解问题的思路，可以写出如下解法。
+```cpp
+vector<int> preorderTraverse(TreeNode* root) {
+    vector<int> res;
+    if(root == nullptr) return res;
+    //根节点在最前面
+    res.push_back(root->val);
+    //左子树在中间
+    vector<int> left = preorderTraverse(root->left);
+    res.insert(res.end(), left.begin(), left.end());
+    //右子树在最后
+    vector<int> right = preorderTraverse(root->right);
+    res.insert(res.end(), right.begin(), right.end());
+    return res;
+}
+```
+其中，`res.insert(res.end(), left.begin(), left.end());`这一步，就是将左子树的结果插入到根节点的后面。
+
+insert函数的第一个参数是插入的位置，第二个参数是插入的起始位置，第三个参数是插入的结束位置。
+
+##### 层序遍历
+
+BFS的核心代码就是根据二叉树的层序遍历框架写出来的。
+
+```cpp
+//输入二叉树的根节点，返回二叉树的层序遍历结果
+int levelTraverse(TreeNode* root) {
+    if(root == nullptr) return 0;
+    queue<TreeNode*> q;
+    q.push(root);
+    int depth = 0;
+    while(!q.empty()) {
+        int size = q.size();
+        //遍历当前层
+        for(int i = 0; i < size; i++) {
+            TreeNode* node = q.front();
+            q.pop();
+            if(node->left) q.push(node->left);
+            if(node->right) q.push(node->right);
+        }
+        depth++;
+    }
+    return depth;
+}
+```
+层序遍历的核心代码就是这样，只要稍作修改，就可以解决很多二叉树问题。
+
+##### 二叉树总结
+
+上述这些算法（遍历、分治、动态规划）本质都是穷举二叉树，有条件时通过剪枝或者备忘录减少冗余计算。
